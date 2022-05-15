@@ -25,7 +25,10 @@ public class LoginCheckFilter implements Filter {
                 "/employee/login",
                 "/employee/logout",
                 "/backend/**",
-                "/front/**"
+                "/front/**",
+                "/common/**",
+                "/user/sendMsg",
+                "/user/login"
         };
 
         //判断是否需要处理本次请求
@@ -43,8 +46,15 @@ public class LoginCheckFilter implements Filter {
             return;
         }
 
+        //判断客户端是否登录
+        if(request.getSession().getAttribute("user")!=null){
+            BaseContext.setCurrentId((Long) request.getSession().getAttribute("user"));
+            filterChain.doFilter(request,response);
+            return;
+        }
+
         //如果未登录，则返回json信息
-        response.getWriter().write(JSON.toJSONString(R.error("NOTLOGING")));
+        response.getWriter().write(JSON.toJSONString(R.error("NOTLOGIN")));
     }
 
     public boolean check(String[] urls,String requestURI){
